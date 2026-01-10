@@ -1,0 +1,34 @@
+alias: UC2 Moisture Control
+description: Turns fan on/off based on moisture sensor
+triggers:
+  - type: moist
+    device_id: 95e14c9e384e633135ccddd4fb26acc9
+    entity_id: sensor.esphome_web_99cff8_humidity
+    domain: binary_sensor
+    id: moist
+    trigger: device
+  - type: not_moist
+    device_id: 95e14c9e384e633135ccddd4fb26acc9
+    entity_id: sensor.esphome_web_99cff8_humidity
+    domain: binary_sensor
+    id: dry
+    trigger: device
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: moist
+        sequence:
+          - type: turn_on
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: fan.esphome_web_99cff8_dc_fan
+            domain: fan
+      - conditions:
+          - condition: trigger
+            id: dry
+        sequence:
+          - type: turn_off
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: fan.esphome_web_99cff8_dc_fan
+            domain: fan
+mode: single

@@ -1,0 +1,74 @@
+alias: UC3 Gas Detection
+description: Monitors the gas sensor and automatically reacts to gas presence.
+triggers:
+  - id: gas
+    type: gas
+    trigger: device
+    device_id: 95e14c9e384e633135ccddd4fb26acc9
+    entity_id: binary_sensor.esphome_web_99cff8_gas_sensor
+    domain: binary_sensor
+  - id: no_gas
+    type: no_gas
+    trigger: device
+    device_id: 95e14c9e384e633135ccddd4fb26acc9
+    entity_id: binary_sensor.esphome_web_99cff8_gas_sensor
+    domain: binary_sensor
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: gas
+        sequence:
+          - action: mqtt.publish
+            metadata: {}
+            data:
+              topic: haus_rene/gas
+              payload: "ON"
+          - type: turn_on
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: fan.esphome_web_99cff8_dc_fan
+            domain: switch
+          - type: turn_on
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: light.esphome_web_99cff8_warning_indicator
+            domain: light
+            flash: short
+            brightness_pct: 100
+          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+            domain: cover
+            entity_id: cover.esphome_web_99cff8_fenster
+            type: open
+          - delay: "00:00:01"
+          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+            domain: cover
+            entity_id: cover.esphome_web_99cff8_fenster
+            type: stop
+      - conditions:
+          - condition: trigger
+            id: no_gas
+        sequence:
+          - action: mqtt.publish
+            metadata: {}
+            data:
+              topic: haus_rene/gas
+              payload: "OFF"
+          - type: turn_off
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: fan.esphome_web_99cff8_dc_fan
+            domain: switch
+          - type: turn_off
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: light.esphome_web_99cff8_warning_indicator
+            domain: light
+            flash: short
+            brightness_pct: 100
+          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+            domain: cover
+            entity_id: cover.esphome_web_99cff8_fenster
+            type: close
+          - delay: "00:00:01"
+          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+            domain: cover
+            entity_id: cover.esphome_web_99cff8_fenster
+            type: stop
+mode: single

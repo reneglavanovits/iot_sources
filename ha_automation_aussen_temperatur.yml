@@ -1,0 +1,35 @@
+alias: Aussen Temperatur
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - binary_sensor.esphome_web_99cff8_button_left
+    id: minus
+  - trigger: state
+    entity_id:
+      - binary_sensor.esphome_web_99cff8_button_right
+    id: plus
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - minus
+        sequence:
+          - action: input_number.decrement
+            metadata: {}
+            data: {}
+            target:
+              entity_id: input_number.aussen_temperatur
+      - conditions:
+          - condition: trigger
+            id:
+              - plus
+        sequence:
+          - action: input_number.increment
+            metadata: {}
+            data: {}
+            target:
+              entity_id: input_number.aussen_temperatur
+mode: single

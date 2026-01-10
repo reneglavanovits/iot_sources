@@ -1,0 +1,188 @@
+esphome:
+  name: esphome-web-xxx
+  friendly_name: ESP Haus 22
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "w9h3pEd19FIOkWiXaZCKEjRAKhxEOY9ujri7FkcwDBA="
+
+ota:
+  - platform: esphome
+    password: "xxx"
+
+wifi:
+  ssid: "<ssid>"
+  password: "<password>" 
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esp-Haus-22 Fallback Hotspot"
+    password: "<password>"
+
+captive_portal:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO16
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Button left"
+  - platform: gpio
+    pin:
+      number: GPIO27
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Button right"
+  - platform: gpio
+    pin: 
+      number: GPIO23
+    name: "Gas Sensor"
+    device_class: gas      # Shows "Detected" / "Clear" in Home Assistant
+  - platform: analog_threshold
+    name: "Steam Detector"
+    sensor_id: water_volts # Links to the hidden ADC sensor
+    threshold: 1.2         # Voltage limit (matches >1500 raw)
+    device_class: moisture # Shows as "Dry" or "Wet" in HA
+sensor:
+  - platform: dht
+    pin: GPIO17
+    temperature:
+      name: "Temperature"
+    humidity:
+      name: "Humidity"
+    model: DHT11
+    update_interval: 10s
+
+  - platform: adc
+    pin: GPIO34
+    id: water_volts
+    name: "Water Level"
+    update_interval: 5s
+    attenuation: 11db
+    internal: true
+
+
+script:
+  - id: siren_script
+    mode: restart
+    then:
+      - while:
+          condition:
+            lambda: 'return true;'
+          then:
+            # High Tone
+            - output.ledc.set_frequency:
+                id: alarm_buzzer
+                frequency: 1000 Hz
+            - output.set_level:
+                id: alarm_buzzer
+                level: 50% # 50% creates the sound wave
+            - delay: 500ms
+
+            # Low Tone
+            - output.ledc.set_frequency:
+                id: alarm_buzzer
+                frequency: 500 Hz
+            - output.set_level:
+                id: alarm_buzzer
+                level: 50% # 50% creates the sound wave
+            - delay: 500ms
+
+switch:
+  - platform: template
+    name: "Buzzer Alarm"
+    optimistic: true
+    turn_on_action:
+      - script.execute: siren_script
+    turn_off_action:
+      - script.stop: siren_script
+      - output.turn_off: alarm_buzzer
+      - output.set_level: # Ensure silence
+          id: alarm_buzzer
+          level: 0%
+output:
+  - platform: ledc
+    pin: GPIO25
+    id: alarm_buzzer
+    frequency: 500 Hz
+# Output for INA (GPIO19)
+  - platform: ledc
+    pin: GPIO19
+    id: fan_output_a
+    frequency: 20000 Hz
+
+  # Output for INB (GPIO18)
+  - platform: ledc
+    pin: GPIO18
+    id: fan_output_b
+    frequency: 20000 Hz
+
+  - platform: ledc
+    id: servo_pwm
+    pin: GPIO5
+    frequency: 50 Hz
+
+  - platform: ledc # Use ledc (PWM) instead of gpio for effects
+    pin: GPIO12
+    id: yellow_led_output
+    frequency: 1000 Hz
+    #inverted: true
+fan:
+  - platform: hbridge
+    name: "DC Fan"
+    pin_a: fan_output_a
+    pin_b: fan_output_b
+    # "decay_mode" controls how the motor slows down. 
+    # SLOW is usually quieter and smoother for fans.
+    decay_mode: SLOW
+
+servo:
+  - id: window_servo
+    output: servo_pwm
+    # From your code: myservo.attach(servoPin, 1000, 2000)
+    # 50Hz = 20ms period. 
+    # 1000us = 5% duty cycle. 2000us = 10% duty cycle.
+    min_level: 5%
+    max_level: 10%
+
+cover:
+  - platform: template
+    name: "Fenster"
+    device_class: window
+    optimistic: true # Tell HA to assume the action worked
+    open_action:
+      - servo.write:
+          id: window_servo
+          level: 0.977 # CORRECTED from 97.7% (176/180)
+    close_action:
+      - servo.write:
+          id: window_servo
+          level: 0.0   # CORRECTED from 0%
+    stop_action:
+      - servo.detach: window_servo
+
+light:
+  - platform: monochromatic # Monochromatic supports effects like flicker
+    output: yellow_led_output
+    name: "Warning Indicator"
+    id: warning_led
+    effects:
+      - lambda: # <--- CORRECTED: Using the reliable 'lambda' effect
+          name: "Warning Blink"
+          update_interval: 50ms
+          lambda: |-
+            // Calculate state: 1.0 (ON) or 0.0 (OFF) based on time
+            float level = (millis() % 400) < 200 ? 1.0 : 0.0;
+
+            // ACTION: Set the output level directly (instead of returning)
+            id(yellow_led_output).set_level(level);

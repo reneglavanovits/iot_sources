@@ -1,0 +1,54 @@
+alias: UC1 Ambient Temperature
+description: Automatically controls the fan and window based on ambient temperature.
+triggers:
+  - id: hot
+    type: temperature
+    device_id: 95e14c9e384e633135ccddd4fb26acc9
+    entity_id: sensor.esphome_web_99cff8_temperature
+    domain: sensor
+    trigger: device
+    above: 25
+  - id: cold
+    type: temperature
+    device_id: 95e14c9e384e633135ccddd4fb26acc9
+    entity_id: sensor.esphome_web_99cff8_temperature
+    domain: sensor
+    trigger: device
+    below: 24.9
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: hot
+        sequence:
+          - type: turn_on
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: fan.esphome_web_99cff8_dc_fan
+            domain: fan
+          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+            domain: cover
+            entity_id: cover.esphome_web_99cff8_fenster
+            type: open
+          - delay: "00:00:01"
+          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+            domain: cover
+            entity_id: cover.esphome_web_99cff8_fenster
+            type: stop
+      - conditions:
+          - condition: trigger
+            id: cold
+        sequence:
+          - type: turn_off
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: fan.esphome_web_99cff8_dc_fan
+            domain: fan
+          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+            domain: cover
+            entity_id: cover.esphome_web_99cff8_fenster
+            type: close
+          - delay: "00:00:01"
+          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+            domain: cover
+            entity_id: cover.esphome_web_99cff8_fenster
+            type: stop
+mode: single

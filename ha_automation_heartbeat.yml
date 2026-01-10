@@ -1,0 +1,28 @@
+alias: Publish Heartbeat
+description: ""
+triggers:
+  - trigger: time_pattern
+    seconds: /30
+  - trigger: state
+    entity_id:
+      - binary_sensor.esphome_web_99cff8_esp_status
+conditions: []
+actions:
+  - if:
+      - condition: state
+        entity_id: binary_sensor.esphome_web_99cff8_esp_status
+        state:
+          - "on"
+    then:
+      - action: mqtt.publish
+        metadata: {}
+        data:
+          topic: haus_rene/status
+          payload: "ON"
+    else:
+      - action: mqtt.publish
+        metadata: {}
+        data:
+          topic: haus_rene/status
+          payload: "OFF"
+mode: single

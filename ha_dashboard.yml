@@ -1,0 +1,149 @@
+views:
+  - title: Home
+    sections:
+      - type: grid
+        cards:
+          - clock_style: digital
+            clock_size: medium
+            show_seconds: false
+            no_background: false
+            type: clock
+            face_style: markers
+            grid_options:
+              columns: 12
+              rows: 2
+          - show_current: false
+            show_forecast: true
+            type: weather-forecast
+            entity: weather.forecast_home
+            forecast_type: daily
+          - type: tile
+            entity: sensor.eisenstadt_temperature
+            color: purple
+            vertical: false
+            features:
+              - type: trend-graph
+                hours_to_show: 48
+            features_position: bottom
+          - type: tile
+            entity: sensor.eisenstadt_humidity
+            vertical: false
+            features:
+              - type: trend-graph
+                hours_to_show: 48
+            features_position: bottom
+          - type: tile
+            entity: sensor.esphome_web_99cff8_temperature
+            color: purple
+            vertical: false
+            features:
+              - type: trend-graph
+                hours_to_show: 48
+            features_position: bottom
+          - type: tile
+            entity: sensor.esphome_web_99cff8_humidity
+            color: blue
+            vertical: false
+            features:
+              - type: trend-graph
+                hours_to_show: 48
+            features_position: bottom
+          - type: tile
+            entity: input_number.aussen_temperatur
+            vertical: false
+            features_position: bottom
+            grid_options:
+              columns: 12
+              rows: 1
+            features:
+              - type: numeric-input
+                style: buttons
+      - type: grid
+        cards:
+          - type: tile
+            entity: fan.esphome_web_99cff8_dc_fan
+            vertical: false
+            features:
+              - type: toggle
+            features_position: bottom
+          - type: tile
+            entity: cover.esphome_web_99cff8_fenster
+            vertical: false
+            features:
+              - type: cover-open-close
+            features_position: bottom
+          - type: entity
+            entity: binary_sensor.esphome_web_99cff8_gas_sensor
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: tile
+            entity: binary_sensor.esphome_web_99cff8_steam_detector
+            vertical: false
+            features_position: bottom
+      - type: grid
+        cards:
+          - type: tile
+            entity: binary_sensor.esphome_web_99cff8_button_left
+            vertical: false
+            features_position: bottom
+          - type: tile
+            entity: binary_sensor.esphome_web_99cff8_button_right
+            vertical: false
+            features_position: bottom
+          - type: logbook
+            target:
+              entity_id:
+                - fan.esphome_web_99cff8_dc_fan
+                - cover.esphome_web_99cff8_fenster
+                - binary_sensor.esphome_web_99cff8_gas_sensor
+                - binary_sensor.esphome_web_99cff8_steam_detector
+            title: Aktivitäten
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Verbindungsstatus
+          - type: tile
+            entity: binary_sensor.haus_rene_status_haus_rene_status
+            vertical: false
+            features_position: bottom
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: tile
+            entity: binary_sensor.haus_marcus_status_haus_marcus_status
+            vertical: false
+            features_position: bottom
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: tile
+            entity: binary_sensor.haus_marco_status_haus_marco_status
+            vertical: false
+            features_position: bottom
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: heading
+            icon: ''
+            heading: MQTT
+            heading_style: subtitle
+          - type: tile
+            entity: input_boolean.mqtt_marcus
+            vertical: false
+            features_position: bottom
+            grid_options:
+              columns: 12
+              rows: 1
+            features:
+              - type: toggle
+          - type: tile
+            entity: input_boolean.mqtt_marco
+            vertical: false
+            features_position: bottom
+            features:
+              - type: toggle
+            grid_options:
+              columns: 12
+              rows: 2
