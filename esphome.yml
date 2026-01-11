@@ -31,6 +31,9 @@ wifi:
 captive_portal:
 
 binary_sensor:
+  - platform: status
+    name: "ESP Status"
+    id: house_a_status
   - platform: gpio
     pin:
       number: GPIO16
