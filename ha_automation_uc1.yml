@@ -3,48 +3,83 @@ description: Automatically controls the fan and window based on ambient temperat
 triggers:
   - trigger: numeric_state
     entity_id:
-      - sensor.esphome_web_99cff8_temperature
-    above: input_number.aussen_temperatur
-    id: hot
+      - sensor.esphome_temperature
+    above: 25
+    id: interior_hot
+    alias: Interior above 25°C
+  - alias: Interior below 22°C
+    trigger: numeric_state
+    entity_id:
+      - sensor.esphome_temperature
+    id: interior_cold
+    below: 22
   - trigger: numeric_state
     entity_id:
-      - sensor.esphome_web_99cff8_temperature
-    id: cold
-    below: input_number.aussen_temperatur
+      - sensor.esphome_temperature
+    above: 22
+    below: 25
+    id: desired_temps
+conditions: []
 actions:
   - choose:
       - conditions:
           - condition: trigger
-            id: hot
+            id:
+              - interior_hot
+          - condition: numeric_state
+            entity_id: input_number.aussen_temperatur
+            below: 25
         sequence:
           - type: turn_on
-            device_id: 95e14c9e384e633135ccddd4fb26acc9
-            entity_id: fan.esphome_web_99cff8_dc_fan
+            device_id: 66c17f462dd54503a9410404ea12080e
+            entity_id: 76f384e2957887801d3b735bc42bf8cb
             domain: fan
-          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+          - device_id: 66c17f462dd54503a9410404ea12080e
             domain: cover
-            entity_id: cover.esphome_web_99cff8_fenster
+            entity_id: 979506d6128a44847aefc8ca1602d3c0
             type: open
           - delay: "00:00:01"
-          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+          - device_id: 66c17f462dd54503a9410404ea12080e
             domain: cover
-            entity_id: cover.esphome_web_99cff8_fenster
+            entity_id: 979506d6128a44847aefc8ca1602d3c0
             type: stop
       - conditions:
           - condition: trigger
-            id: cold
+            id:
+              - interior_cold
+          - condition: numeric_state
+            entity_id: input_number.aussen_temperatur
+            above: 22
+        sequence:
+          - type: turn_on
+            device_id: 66c17f462dd54503a9410404ea12080e
+            entity_id: 76f384e2957887801d3b735bc42bf8cb
+            domain: fan
+          - device_id: 66c17f462dd54503a9410404ea12080e
+            domain: cover
+            entity_id: 979506d6128a44847aefc8ca1602d3c0
+            type: open
+          - delay: "00:00:01"
+          - device_id: 66c17f462dd54503a9410404ea12080e
+            domain: cover
+            entity_id: 979506d6128a44847aefc8ca1602d3c0
+            type: stop
+      - conditions:
+          - condition: trigger
+            id:
+              - desired_temps
         sequence:
           - type: turn_off
-            device_id: 95e14c9e384e633135ccddd4fb26acc9
-            entity_id: fan.esphome_web_99cff8_dc_fan
+            device_id: 66c17f462dd54503a9410404ea12080e
+            entity_id: 76f384e2957887801d3b735bc42bf8cb
             domain: fan
-          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+          - device_id: 66c17f462dd54503a9410404ea12080e
             domain: cover
-            entity_id: cover.esphome_web_99cff8_fenster
+            entity_id: 979506d6128a44847aefc8ca1602d3c0
             type: close
           - delay: "00:00:01"
-          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+          - device_id: 66c17f462dd54503a9410404ea12080e
             domain: cover
-            entity_id: cover.esphome_web_99cff8_fenster
+            entity_id: 979506d6128a44847aefc8ca1602d3c0
             type: stop
 mode: single
