@@ -2,33 +2,45 @@ alias: UC2 Moisture Control
 description: Turns fan on/off based on moisture sensor
 triggers:
   - type: moist
-    device_id: 95e14c9e384e633135ccddd4fb26acc9
-    entity_id: sensor.esphome_web_99cff8_humidity
+    device_id: 66c17f462dd54503a9410404ea12080e
+    entity_id: 32d0379a0a4eb3e581231cea058edee3
     domain: binary_sensor
     id: moist
-    trigger: device
-  - type: not_moist
-    device_id: 95e14c9e384e633135ccddd4fb26acc9
-    entity_id: sensor.esphome_web_99cff8_humidity
-    domain: binary_sensor
-    id: dry
     trigger: device
 actions:
   - choose:
       - conditions:
           - condition: trigger
-            id: moist
+            id:
+              - moist
+          - condition: numeric_state
+            entity_id: sensor.esphome_humidity
+            above: 60
         sequence:
-          - type: turn_on
-            device_id: 95e14c9e384e633135ccddd4fb26acc9
-            entity_id: fan.esphome_web_99cff8_dc_fan
-            domain: fan
-      - conditions:
-          - condition: trigger
-            id: dry
-        sequence:
+          - repeat:
+              while:
+                - condition: numeric_state
+                  entity_id: sensor.esphome_humidity
+                  above: 60
+              sequence:
+                - if:
+                    - condition: device
+                      device_id: 66c17f462dd54503a9410404ea12080e
+                      domain: fan
+                      entity_id: 76f384e2957887801d3b735bc42bf8cb
+                      type: is_off
+                  then:
+                    - type: turn_on
+                      device_id: 66c17f462dd54503a9410404ea12080e
+                      entity_id: 76f384e2957887801d3b735bc42bf8cb
+                      domain: fan
+                - delay:
+                    hours: 0
+                    minutes: 5
+                    seconds: 0
+                    milliseconds: 0
           - type: turn_off
-            device_id: 95e14c9e384e633135ccddd4fb26acc9
-            entity_id: fan.esphome_web_99cff8_dc_fan
+            device_id: 66c17f462dd54503a9410404ea12080e
+            entity_id: 76f384e2957887801d3b735bc42bf8cb
             domain: fan
 mode: single
