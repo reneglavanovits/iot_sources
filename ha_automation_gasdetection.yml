@@ -41,25 +41,52 @@ conditions:
               - marcus_gas_ein
               - marcus_gas_aus
 actions:
-  - type: turn_off
-    device_id: 95e14c9e384e633135ccddd4fb26acc9
-    entity_id: 4fa9f89c4c0e4029a771a487ec2da735
-    domain: fan
-  - type: turn_on
-    device_id: 95e14c9e384e633135ccddd4fb26acc9
-    entity_id: 9594194840484cf205f64718bf287e69
-    domain: light
-  - device_id: 95e14c9e384e633135ccddd4fb26acc9
-    domain: cover
-    entity_id: fa283e8eaf3458a4dcb805c658801759
-    type: close
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 1
-      milliseconds: 0
-  - device_id: 95e14c9e384e633135ccddd4fb26acc9
-    domain: cover
-    entity_id: fa283e8eaf3458a4dcb805c658801759
-    type: stop
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - marco_gas_ein
+              - marcus_gas_ein
+        sequence:
+          - type: turn_off
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: 4fa9f89c4c0e4029a771a487ec2da735
+            domain: fan
+          - type: turn_on
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: b22ab727e76fd185a8a23d7b9c20af73
+            domain: switch
+          - action: light.turn_on
+            metadata: {}
+            data:
+              effect: Warning Blink
+            target:
+              entity_id: light.esphome_web_99cff8_warning_indicator
+          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+            domain: cover
+            entity_id: fa283e8eaf3458a4dcb805c658801759
+            type: close
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 1
+              milliseconds: 0
+          - device_id: 95e14c9e384e633135ccddd4fb26acc9
+            domain: cover
+            entity_id: fa283e8eaf3458a4dcb805c658801759
+            type: stop
+      - conditions:
+          - condition: trigger
+            id:
+              - marco_gas_aus
+              - marcus_gas_aus
+        sequence:
+          - type: turn_off
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: 9594194840484cf205f64718bf287e69
+            domain: light
+          - type: toggle
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: b22ab727e76fd185a8a23d7b9c20af73
+            domain: switch
 mode: single
