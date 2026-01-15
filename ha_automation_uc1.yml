@@ -1,24 +1,42 @@
 alias: UC1 Ambient Temperature
 description: Automatically controls the fan and window based on ambient temperature.
 triggers:
-  - trigger: numeric_state
+  - alias: Interior above 25°C
+    trigger: numeric_state
     entity_id:
-      - sensor.esphome_temperature
+      - sensor.esphome_web_99cff8_temperature
     above: 25
     id: interior_hot
-    alias: Interior above 25°C
   - alias: Interior below 22°C
     trigger: numeric_state
     entity_id:
-      - sensor.esphome_temperature
+      - sensor.esphome_web_99cff8_temperature
     id: interior_cold
     below: 22
   - trigger: numeric_state
     entity_id:
-      - sensor.esphome_temperature
+      - sensor.esphome_web_99cff8_temperature
     above: 22
     below: 25
     id: desired_temps
+  - trigger: numeric_state
+    entity_id:
+      - input_number.aussen_temperatur
+    id: outside_good
+    above: 22
+    below: 25
+  - trigger: numeric_state
+    entity_id:
+      - input_number.aussen_temperatur
+    above: 25
+    id: outside_hot
+  - type: temperature
+    device_id: 95e14c9e384e633135ccddd4fb26acc9
+    entity_id: a5853b33b8721b7db35d80196d758556
+    domain: sensor
+    trigger: device
+    id: outside_cold
+    below: 22
 conditions: []
 actions:
   - choose:
@@ -26,60 +44,73 @@ actions:
           - condition: trigger
             id:
               - interior_hot
+              - outside_good
           - condition: numeric_state
             entity_id: input_number.aussen_temperatur
             below: 25
         sequence:
-          - type: turn_on
-            device_id: 66c17f462dd54503a9410404ea12080e
-            entity_id: 76f384e2957887801d3b735bc42bf8cb
-            domain: fan
-          - device_id: 66c17f462dd54503a9410404ea12080e
-            domain: cover
-            entity_id: 979506d6128a44847aefc8ca1602d3c0
-            type: open
+          - action: fan.turn_on
+            metadata: {}
+            data: {}
+            target:
+              entity_id: fan.esphome_web_99cff8_dc_fan
+          - action: cover.open_cover
+            metadata: {}
+            data: {}
+            target:
+              entity_id: cover.esphome_web_99cff8_fenster
           - delay: "00:00:01"
-          - device_id: 66c17f462dd54503a9410404ea12080e
-            domain: cover
-            entity_id: 979506d6128a44847aefc8ca1602d3c0
-            type: stop
+          - action: cover.stop_cover
+            metadata: {}
+            data: {}
+            target:
+              entity_id: cover.esphome_web_99cff8_fenster
       - conditions:
           - condition: trigger
             id:
               - interior_cold
+              - outside_good
           - condition: numeric_state
             entity_id: input_number.aussen_temperatur
             above: 22
         sequence:
-          - type: turn_on
-            device_id: 66c17f462dd54503a9410404ea12080e
-            entity_id: 76f384e2957887801d3b735bc42bf8cb
-            domain: fan
-          - device_id: 66c17f462dd54503a9410404ea12080e
-            domain: cover
-            entity_id: 979506d6128a44847aefc8ca1602d3c0
-            type: open
+          - action: cover.open_cover
+            metadata: {}
+            data: {}
+            target:
+              entity_id: cover.esphome_web_99cff8_fenster
+          - action: fan.turn_on
+            metadata: {}
+            data: {}
+            target:
+              entity_id: fan.esphome_web_99cff8_dc_fan
           - delay: "00:00:01"
-          - device_id: 66c17f462dd54503a9410404ea12080e
-            domain: cover
-            entity_id: 979506d6128a44847aefc8ca1602d3c0
-            type: stop
+          - action: cover.stop_cover
+            metadata: {}
+            data: {}
+            target:
+              entity_id: cover.esphome_web_99cff8_fenster
       - conditions:
           - condition: trigger
             id:
+              - outside_cold
               - desired_temps
+              - outside_hot
         sequence:
-          - type: turn_off
-            device_id: 66c17f462dd54503a9410404ea12080e
-            entity_id: 76f384e2957887801d3b735bc42bf8cb
-            domain: fan
-          - device_id: 66c17f462dd54503a9410404ea12080e
-            domain: cover
-            entity_id: 979506d6128a44847aefc8ca1602d3c0
-            type: close
+          - action: cover.close_cover
+            metadata: {}
+            data: {}
+            target:
+              entity_id: cover.esphome_web_99cff8_fenster
+          - action: fan.turn_off
+            metadata: {}
+            data: {}
+            target:
+              entity_id: fan.esphome_web_99cff8_dc_fan
           - delay: "00:00:01"
-          - device_id: 66c17f462dd54503a9410404ea12080e
-            domain: cover
-            entity_id: 979506d6128a44847aefc8ca1602d3c0
-            type: stop
+          - action: cover.stop_cover
+            metadata: {}
+            data: {}
+            target:
+              entity_id: cover.esphome_web_99cff8_fenster
 mode: single
