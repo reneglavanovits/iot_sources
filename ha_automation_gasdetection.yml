@@ -75,6 +75,15 @@ actions:
             domain: cover
             entity_id: fa283e8eaf3458a4dcb805c658801759
             type: stop
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 5
+              milliseconds: 0
+          - type: turn_off
+            device_id: 95e14c9e384e633135ccddd4fb26acc9
+            entity_id: b22ab727e76fd185a8a23d7b9c20af73
+            domain: switch
       - conditions:
           - condition: trigger
             id:
@@ -85,8 +94,4 @@ actions:
             device_id: 95e14c9e384e633135ccddd4fb26acc9
             entity_id: 9594194840484cf205f64718bf287e69
             domain: light
-          - type: toggle
-            device_id: 95e14c9e384e633135ccddd4fb26acc9
-            entity_id: b22ab727e76fd185a8a23d7b9c20af73
-            domain: switch
 mode: single
