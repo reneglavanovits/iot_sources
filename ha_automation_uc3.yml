@@ -4,8 +4,8 @@ triggers:
   - id: gas
     type: gas
     trigger: device
-    device_id: 66c17f462dd54503a9410404ea12080e
-    entity_id: 6a49e2c37bf6c8b0ec53e5fc9c3b4cae
+    device_id: 95e14c9e384e633135ccddd4fb26acc9
+    entity_id: binary_sensor.esphome_web_99cff8_gas_sensor
     domain: binary_sensor
 actions:
   - choose:
@@ -14,11 +14,16 @@ actions:
             id:
               - gas
         sequence:
+          - action: mqtt.publish
+            metadata: {}
+            data:
+              topic: haus_rene/gas
+              payload: "ON"
           - parallel:
-              - parallel:
+              - sequence:
                   - type: turn_on
-                    device_id: 66c17f462dd54503a9410404ea12080e
-                    entity_id: 14b90bba275ead15edcfa5501c3275fa
+                    device_id: 95e14c9e384e633135ccddd4fb26acc9
+                    entity_id: b22ab727e76fd185a8a23d7b9c20af73
                     domain: switch
                   - delay:
                       hours: 0
@@ -26,48 +31,59 @@ actions:
                       seconds: 5
                       milliseconds: 0
                   - type: turn_off
-                    device_id: 66c17f462dd54503a9410404ea12080e
-                    entity_id: 14b90bba275ead15edcfa5501c3275fa
+                    device_id: 95e14c9e384e633135ccddd4fb26acc9
+                    entity_id: b22ab727e76fd185a8a23d7b9c20af73
                     domain: switch
-              - device_id: 66c17f462dd54503a9410404ea12080e
-                domain: light
-                entity_id: 84da28278320372e310554e8819fbb57
-                type: flash
-              - parallel:
-                  - device_id: 66c17f462dd54503a9410404ea12080e
+              - sequence:
+                  - device_id: 95e14c9e384e633135ccddd4fb26acc9
                     domain: cover
-                    entity_id: 979506d6128a44847aefc8ca1602d3c0
+                    entity_id: cover.esphome_web_99cff8_fenster
                     type: open
                   - delay:
                       hours: 0
                       minutes: 0
                       seconds: 1
                       milliseconds: 0
-                  - device_id: 66c17f462dd54503a9410404ea12080e
+                  - device_id: 95e14c9e384e633135ccddd4fb26acc9
                     domain: cover
-                    entity_id: 979506d6128a44847aefc8ca1602d3c0
+                    entity_id: cover.esphome_web_99cff8_fenster
                     type: stop
-          - wait_for_trigger:
-              - type: no_gas
-                device_id: 66c17f462dd54503a9410404ea12080e
-                entity_id: 6a49e2c37bf6c8b0ec53e5fc9c3b4cae
-                domain: binary_sensor
-                trigger: device
-          - type: turn_off
-            device_id: 66c17f462dd54503a9410404ea12080e
-            entity_id: 84da28278320372e310554e8819fbb57
-            domain: light
-          - device_id: 66c17f462dd54503a9410404ea12080e
-            domain: cover
-            entity_id: 979506d6128a44847aefc8ca1602d3c0
-            type: close
-          - delay:
-              hours: 0
-              minutes: 0
-              seconds: 1
-              milliseconds: 0
-          - device_id: 66c17f462dd54503a9410404ea12080e
-            domain: cover
-            entity_id: 979506d6128a44847aefc8ca1602d3c0
-            type: stop
+              - device_id: 95e14c9e384e633135ccddd4fb26acc9
+                domain: light
+                entity_id: light.esphome_web_99cff8_warning_indicator
+                type: flash
+              - sequence:
+                  - wait_for_trigger:
+                      - type: no_gas
+                        device_id: 95e14c9e384e633135ccddd4fb26acc9
+                        entity_id: binary_sensor.esphome_web_99cff8_gas_sensor
+                        domain: binary_sensor
+                        trigger: device
+                  - delay:
+                      hours: 0
+                      minutes: 0
+                      seconds: 10
+                      milliseconds: 0
+                  - action: mqtt.publish
+                    metadata: {}
+                    data:
+                      topic: haus_rene/gas
+                      payload: "OFF"
+                  - type: turn_off
+                    device_id: 95e14c9e384e633135ccddd4fb26acc9
+                    entity_id: light.esphome_web_99cff8_warning_indicator
+                    domain: light
+                  - device_id: 95e14c9e384e633135ccddd4fb26acc9
+                    domain: cover
+                    entity_id: cover.esphome_web_99cff8_fenster
+                    type: close
+                  - delay:
+                      hours: 0
+                      minutes: 0
+                      seconds: 1
+                      milliseconds: 0
+                  - device_id: 95e14c9e384e633135ccddd4fb26acc9
+                    domain: cover
+                    entity_id: cover.esphome_web_99cff8_fenster
+                    type: stop
 mode: single
