@@ -88,27 +88,21 @@ actions:
             data: {}
             target:
               entity_id: cover.esphome_web_99cff8_fenster
-      - conditions:
-          - condition: trigger
-            id:
-              - outside_cold
-              - desired_temps
-              - outside_hot
-        sequence:
-          - action: cover.close_cover
-            metadata: {}
-            data: {}
-            target:
-              entity_id: cover.esphome_web_99cff8_fenster
-          - action: fan.turn_off
-            metadata: {}
-            data: {}
-            target:
-              entity_id: fan.esphome_web_99cff8_dc_fan
-          - delay: "00:00:01"
-          - action: cover.stop_cover
-            metadata: {}
-            data: {}
-            target:
-              entity_id: cover.esphome_web_99cff8_fenster
+    default:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.esphome_web_99cff8_fenster
+      - action: fan.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: fan.esphome_web_99cff8_dc_fan
+      - delay: "00:00:01"
+      - action: cover.stop_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.esphome_web_99cff8_fenster
 mode: single
