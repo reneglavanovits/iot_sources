@@ -30,11 +30,9 @@ triggers:
       - input_number.aussen_temperatur
     above: 25
     id: outside_hot
-  - type: temperature
-    device_id: 95e14c9e384e633135ccddd4fb26acc9
-    entity_id: a5853b33b8721b7db35d80196d758556
-    domain: sensor
-    trigger: device
+  - trigger: numeric_state
+    entity_id:
+      - input_number.aussen_temperatur
     id: outside_cold
     below: 22
 conditions: []
